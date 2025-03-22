@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+
+<html>
+    <head>
+        <title>Attacker Website</title>
+        <style>
+            body {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                text-align: center;
+            }
+            .iframe-container {
+                position: relative;
+                border: none;
+                width: 2000px;
+                height: 2000px;
+                overflow: hidden;
+            }
+            iframe {
+                width: 100%;
+                height: 100%;
+                border: none;
+            }
+        </style>
+    </head>
+    <body>
+        <h1>Attacker Website</h1>
+        <script type="module" src="/app.js"></script>
+        <canvas id="canvas" width="2000" height="2000" style="display: none;"></canvas>
+        <svg width="0" height="0" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+                <pattern width="100%" height="100%" id="noise-pattern"></pattern>
+            </defs>
+        </svg>
+        <div id="target-pixel" class="iframe-container">
+            <iframe id="target-iframe" src="http://localhost:8001"></iframe>
+        </div>
+    </body>
+</html>

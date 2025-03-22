@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+
+<head>
+    <title>Victim Website</title>
+    <style>
+        body {
+            background-color: white;
+            color: black;
+            text-align: center;
+        }
+        .target-pixel {
+            width: 1px;
+            height: 1px;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Victim Website</h1>
+    <div id="targetPixel" class="target-pixel"></div>
+    <script type="text/javascript">
+        const target = document.getElementById("targetPixel");
+        const alternateInterval = 10000;
+
+        let color = "white"
+        target.style.backgroundColor = "white";
+        setInterval(() => {
+            color = color === "white" ? "black" : "white";
+            target.style.backgroundColor = color;
+        }, alternateInterval);
+    </script>
+</body>
