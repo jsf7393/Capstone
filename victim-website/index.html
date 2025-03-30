@@ -20,16 +20,6 @@
 
 <body>
     <h1>Victim Website</h1>
-    <div id="targetPixel" class="target-pixel"></div>
-    <script type="text/javascript">
-        const target = document.getElementById("targetPixel");
-        const alternateInterval = 10000;
-
-        let color = "white"
-        target.style.backgroundColor = "white";
-        setInterval(() => {
-            color = color === "white" ? "black" : "white";
-            target.style.backgroundColor = color;
-        }, alternateInterval);
-    </script>
+    <canvas id="canvas" width="28" height="28" style="position: absolute; top:0; left:0"></canvas>
+    <script type="module" src="/app.js"></script>
 </body>
