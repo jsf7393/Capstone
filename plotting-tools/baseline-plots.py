@@ -7,16 +7,36 @@ def main():
     fig.suptitle("Baseline Plots")
 
     with open("./../attacker-website/white_baseline.txt") as file:
-        data = json.load(file)
+        data = file.readline()
 
-        white_baseline = data["1"]
+        json_objs = [x + "}" for x in data.split("}")][0:-1]
+
+        parsed_objs = [json.loads(x) for x in json_objs]
+        
+        i = 1
+        summed = np.zeros(len(parsed_objs[0]["1"]))
+        for obj in parsed_objs:
+            summed += np.array(obj[str(i)])
+            i += 1
+
+        white_baseline = summed / len(parsed_objs)
         x = np.linspace(0, len(white_baseline), len(white_baseline))
         ax1.plot(x, white_baseline)
 
     with open("./../attacker-website/black_baseline.txt") as file:
-        data = json.load(file)
+        data = file.readline()
 
-        black_baseline = data["1"]
+        json_objs = [x + "}" for x in data.split("}")][0:-1]
+
+        parsed_objs = [json.loads(x) for x in json_objs]
+        
+        i = 12
+        summed = np.zeros(len(parsed_objs[0]["12"]))
+        for obj in parsed_objs:
+            summed += np.array(obj[str(i)])
+            i += 1
+
+        black_baseline = summed / len(parsed_objs)
         x = np.linspace(0, len(black_baseline), len(black_baseline))
         ax2.plot(x, black_baseline)
     

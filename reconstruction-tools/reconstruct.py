@@ -11,16 +11,36 @@ def main():
         file.close()
 
     with open("./../attacker-website/white_baseline.txt") as file:
-        data = json.load(file)
+        data = file.readline()
 
-        white_baseline = data["1"]
+        json_objs = [x + "}" for x in data.split("}")][0:-1]
+
+        parsed_objs = [json.loads(x) for x in json_objs]
+        
+        i = 1
+        summed = np.zeros(len(parsed_objs[0]["1"]))
+        for obj in parsed_objs:
+            summed += np.array(obj[str(i)])
+            i += 1
+
+        white_baseline = summed / len(parsed_objs)
 
         file.close()
 
     with open("./../attacker-website/black_baseline.txt") as file:
-        data = json.load(file)
+        data = file.readline()
 
-        black_baseline = data["1"]
+        json_objs = [x + "}" for x in data.split("}")][0:-1]
+
+        parsed_objs = [json.loads(x) for x in json_objs]
+        
+        i = 1
+        summed = np.zeros(len(parsed_objs[0]["1"]))
+        for obj in parsed_objs:
+            summed += np.array(obj[str(i)])
+            i += 1
+
+        black_baseline = summed / len(parsed_objs)
 
         file.close()
 
