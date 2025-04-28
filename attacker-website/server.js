@@ -54,3 +54,7 @@ server.post("/api", (req, res) => {
         res.end(err.message);
     }
 });
+
+server.get("/args", (req, res) => {
+    res.send(process.argv.slice(2));
+});

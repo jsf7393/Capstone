@@ -21,5 +21,23 @@ fetch("http://localhost:8001/args", {
             }
 
             img.src = args[1] + ".png"
+        } else if (args[0] === "alternate") {
+            const alternate_interval = args[1];
+
+            const canvas = document.getElementById("canvas");
+            const ctx = canvas.getContext("2d");
+            let white = true
+            ctx.fillStyle = "white";
+            ctx.fillRect(0, 0, 1, 1);
+            setInterval(() => {
+                if (white) {
+                    ctx.fillStyle = "black";
+                    ctx.fillRect(0, 0, 1, 1);
+                } else {
+                    ctx.fillStyle = "white";
+                    ctx.fillRect(0, 0, 1, 1);
+                }
+                white = !white
+            }, alternate_interval * 1000)
         }
     });
